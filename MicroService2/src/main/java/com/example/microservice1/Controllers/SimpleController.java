@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class SimpleController {
     @GetMapping("/")
     public String TestEndPoint(){
-        return "Ok";
+        return "i'm MicroService2";
     }
 }
