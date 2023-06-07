@@ -42,7 +42,7 @@ public class authenticationTokenFilter extends OncePerRequestFilter {
             String username = null;
             String authToken = null;
             User user;
-            if (requestHeader != null && requestHeader.startsWith("Bearer ")) {
+            if (requestHeader != null && requestHeader.startsWith("Bearer ")&&jwtUtil.validateAccessToken(requestHeader.substring(7))) {
                 authToken = requestHeader.substring(7);
                 try {
                     username = jwtUtil.getUsernameFromToken(authToken);
@@ -59,15 +59,12 @@ public class authenticationTokenFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 logger.debug("security context was null, so authorizating user");
 
-                // It is not compelling necessary to load the use details from the database. You could also store the information
-                // in the token and read it from it. It's up to you ;)
                 Optional<User> optionalUser = this.userService.getUser(username);
                 if(!optionalUser.isPresent()) {
                     throw new Exception();
                 }
                 user = optionalUser.get();
-                // For simple validation it is completely sufficient to just check the token integrity. You don't have to call
-                // the database compellingly. Again it's up to you ;)
+
                 if (jwtUtil.validateAccessToken(authToken)) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, null);
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

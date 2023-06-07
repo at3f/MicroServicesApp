@@ -12,8 +12,6 @@ import java.util.function.Function;
 public class JWTUtil {
     @Value("${jwt.secret}")
     private String secret;
-    @Value("${jwt.expiration}")
-    private Long expiration;
     private Clock clock = DefaultClock.INSTANCE;
 
     public boolean validateAccessToken(String token) {
@@ -39,16 +37,15 @@ public class JWTUtil {
     //taked password in considration for test only
     public String getAccessToken(User user){
         final Date createdDate = clock.now();
-        final Date expirationDate = new Date(createdDate.getTime() + 1440 * 60 * 1000);
+        final Date expirationDate = new Date(createdDate.getTime() + 60 * 1000);
 //        final Date expirationDate = new Date(createdDate.getTime() + 1);
 
-        String AccessToken = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(user.getUsername())
                 .setIssuedAt(createdDate)
                 .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
-        return AccessToken;
     }
     private Claims getAllClaimsFromToken(String token) {
         token = token.replace("Bearer ", "");
